@@ -1,25 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ConfigProvider, theme, Space, Input, Button } from 'antd';
 
-function App() {
+const App: React.FC = () => {
+
+  const [darkMode, setDarkMode] = useState(true);
+  const windowQuery = window.matchMedia("(prefers-color-scheme:dark)");
+
+  const darkModeChange = useCallback((event: MediaQueryListEvent) => {
+    console.log(event.matches ? true : false);
+    setDarkMode(event.matches ? true : false);
+  }, []);
+
+  useEffect(() => {
+    windowQuery.addEventListener("change", darkModeChange);
+    return () => {
+      windowQuery.removeEventListener("change", darkModeChange);
+    };
+  }, [windowQuery, darkModeChange]);
+
+  useEffect(() => {
+    console.log(windowQuery.matches ? true : false);
+    setDarkMode(windowQuery.matches ? true : false);
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ConfigProvider
+      theme={{
+        algorithm: darkMode ? theme.darkAlgorithm : theme.compactAlgorithm
+      }}
+    >
+    </ConfigProvider>
   );
 }
 
